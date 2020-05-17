@@ -18,36 +18,46 @@ function chatComponent (eachMessage) {
     ${eachMessage.map(function (item, index) {
       return yo`
       <li>
+        <p>Published By: <i>${item.nickname}</i></p>
         <p>${item.date}</p>
         <span>${item.text}</span>
         </li>`
     })}
     </ul>`
 }
-
+// generate the above text ono a page dynamicly with el
 target.appendChild(el)
 
 const chatInput = document.getElementById('chatInput')
+const nicknames = document.getElementById('nickname')
 chatInput.onsubmit = function (evt) {
   evt.preventDefault()
-  const text = chatInput.children[0].value
-  postMessage(text)
+  // this hides the nickname field
+  nicknames.style.display = 'none'
+  // this grabs the nickname field value
+  const nickname = chatInput.children[0].value
+  const text = chatInput.children[1].value
+  // run the inital page
+  initalPage()
+  // call post mesage function with the text and the nickname fileds 
+  postMessage(text, nickname)
 }
 
+// make a new date with this function, format using the below date methods
 function currentDate () {
   const date = new Date()
-  
   return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + (date.getHours() < 12 ? date.getHours() + 'AM' : date.getHours() - 12 + 'PM')
 }
 
-function postMessage (text) {
+// this function posts message to the chat-text file in json format
+function postMessage (text, nickname) {
   console.log('posting message')
   fetch('/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ text: text, date: currentDate() })
+    body: JSON.stringify({ nickname: nickname, text: text, date: currentDate() })
   })
     .then(data => {
       console.log('Success:', data)
@@ -57,33 +67,48 @@ function postMessage (text) {
     })
 }
 
+// get messages from messages route on the server and this reads the file chattext.json and gives us a response that we format to json inorder to use in the render function
 function getMessages () {
   fetch('/messages')
     .then(response => response.json())
-    .then(data => render(data))
+    .then(data => render(data)) // run the render function with data "json"
     .then(data => console.log(data, 'this is data'))
-    //this will get our data better insted of info global
-    //render does not do somthing behind the sense it is a function that we need to make 
 }
 
 // postMessage('hello')
 
+// runs the get messages function every 2 seconds getting all new messages to post on the page
 function initalPage () {
   setInterval(() => {
     getMessages()
   }, 2000)
 }
 
+// ** THE BELOW IS AN EXAMPLE THAT I (AUSTEN MADE AND DID NOT USE FOR NICKNAME) **
+
+
 // this function needs uncomented to run the chat room
 // initalPage()
-// const name = nick('')
 
-// function nick () {
-//   return yo` <input type="text" placeholder="Enter your Nickname" id="nickname"></input><button type="submit">Submit</button>`
+// var element = yo`<form id="nickInput">
+// <input type="text" placeholder="Enter your Nickname">
+// <button id="nickname" type="submit">Submit</button>
+// </form>
+// `
+
+// nicknameInput.appendChild(element)
+
+// function check () {
+//   const nick = nick1
+//   console.log(nick, 'this is nick')
+//   initalPage()
+//   return nick
 // }
-
-// target.appendChild(name)
-
-// nickname.onsubmit = function () {
-//   const nicknames = nickname.value
+// const nickname = document.getElementById('nickname')
+// const nickInput = document.getElementById('nickInput')
+// nickInput.onsubmit = function (evt) {
+//   evt.preventDefault()
+//   nicknameInput.style.display = 'none'
+//   const nick1 = nickInput.children[0].value
+//   check(nick1)
 // }
