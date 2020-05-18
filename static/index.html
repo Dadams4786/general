@@ -6,13 +6,30 @@
   <title>Document</title>
 </head>
 <body>
-  <h1>Hello</h1>
+  <h1><b><i>Welcom to Chit Chat</i></b></h1>
+  <h3>Your Chat Rooms<h3>
+  <select id="room_options">
+      <option>random_humor</optoin>
+      <option>work</optoin>
+      <option>activities</optoin>
+    </select><br><br>
   
+  <h3><b>Message: </b></h3>
   <form id="chatInput">
-    <input type="text" name="nickname" id="nickname" placeholder="enter your nickname"/>
-    <input type="text" name="userInput"/>
+    <input type="text" name="nickname" id="nickname" placeholder="Enter your nickname"/>
+    <input type="text" name="userInput" id="userInput" placeholder="Enter your message"/>
     <button type="submit">Submit</button>
+    <lable for="chat-room-opations"> Channel:
+      </lable>
+    <select id="chat-room-options" form="chatInput">
+      <option>random_humor</optoin>
+      <option>work</optoin>
+      <option>activities</optoin>
+    </select>
   </form>
+
+
+
   <div id="target"></div>
   <script src="bundle.js"></script>
 </body>

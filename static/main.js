@@ -30,17 +30,26 @@ target.appendChild(el)
 
 const chatInput = document.getElementById('chatInput')
 const nicknames = document.getElementById('nickname')
+const userInput = document.getElementById('userInput')
+// get room that user wants to post to
+const room = document.getElementById('chat-room-options')
 chatInput.onsubmit = function (evt) {
   evt.preventDefault()
   // this hides the nickname field
   nicknames.style.display = 'none'
+  // this gets the user room posting location
+  const roomOptions = room.value
   // this grabs the nickname field value
   const nickname = chatInput.children[0].value
+  // this grabs the chat message
   const text = chatInput.children[1].value
+  // console.log(roomOptions, 'this is the room option line 42')
+
   // run the inital page
   initalPage()
   // call post mesage function with the text and the nickname fileds 
-  postMessage(text, nickname)
+  postMessage(text, nickname, roomOptions)
+  userInput.value = ''
 }
 
 // make a new date with this function, format using the below date methods
@@ -50,14 +59,14 @@ function currentDate () {
 }
 
 // this function posts message to the chat-text file in json format
-function postMessage (text, nickname) {
+function postMessage (text, nickname, roomOptions) {
   console.log('posting message')
   fetch('/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ nickname: nickname, text: text, date: currentDate() })
+    body: JSON.stringify({ nickname: nickname, text: text, date: currentDate(), room: roomOptions })
   })
     .then(data => {
       console.log('Success:', data)
