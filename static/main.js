@@ -3,7 +3,16 @@ console.log('hello world!')
 // this is called by getmessages and it has data "messages"
 // this function updates the chatcomponent "array" and calls chatcompont to make a new "dom node" with that data
 function render (messageList) {
+  console.log(messageList, 'this is line 6')
   yo.update(el, chatComponent(messageList))
+}
+
+const roomFilter = document.getElementById('room_filters')
+const roomSelect = document.getElementById('room_options')
+
+roomFilter.onsubmit = function (evt) {
+  evt.preventDefault()
+  getMessages()
 }
 
 // var el = render(getMessages)
@@ -28,17 +37,55 @@ function chatComponent (eachMessage) {
 // generate the above text ono a page dynamicly with el
 target.appendChild(el)
 
+// const roomname = ''
+// function Rooms (room) {
+//   function changeRoom (evt) {
+//     const selectedroom = evt.target.value
+//     roomname.push(selectedroom)
+//   }
+
+//   // const roomName = prompt('enter a room name')
+//   return yo`<div id='rooms>
+//   <button onclick=${addRoom}>Add Room</button>
+//   <select oninput=${changeRoom} name="room" id="room-select">
+//     <option value="">--Select a Room--</option>
+//     ${room.map(roomname => yo`<option value=${roomname} ${roomname === currentRoom ? 'selected' : ''}>${roomname}</option>`)}
+//     </select>
+//   </div>`
+// }
+// const currentRoom = []
+
+// function getRooms (messages, currentRoom) {
+//   const rooms = messages.map(msg => msg.room)
+//   rooms.push(currentRoom) // we have to add the currentRoom to the list, otherwise it won't be an option if there isn't already a message with that room
+//   const filtered = rooms.filter(room => room) // filter out undefined or empty string
+//   return Array.from(new Set(filtered)) // filters out the duplicates
+// }
+// getRooms()
 const chatInput = document.getElementById('chatInput')
 const nicknames = document.getElementById('nickname')
 const userInput = document.getElementById('userInput')
 // get room that user wants to post to
-const room = document.getElementById('chat-room-options')
+const newRoomInput = document.getElementById('new_room_input')
+
+newRoomInput.onsubmit = function (evt) {
+  evt.preventDefault()
+  const newRoom = document.getElementById('new_room_text').value
+  const newSelect = document.createElement('option')
+  newSelect.innerText = newRoom
+  console.log(newRoom)
+  roomSelect.appendChild(newSelect)
+  // yo.update(rooms, selectComponent())
+}
+
 chatInput.onsubmit = function (evt) {
   evt.preventDefault()
+  // const text = chatInput.children[0].value
+  // postMessage(text)
   // this hides the nickname field
   nicknames.style.display = 'none'
   // this gets the user room posting location
-  const roomOptions = room.value
+  const roomOptions = roomSelect.value
   // this grabs the nickname field value
   const nickname = chatInput.children[0].value
   // this grabs the chat message
@@ -47,7 +94,7 @@ chatInput.onsubmit = function (evt) {
 
   // run the inital page
   initalPage()
-  // call post mesage function with the text and the nickname fileds 
+  // call post mesage function with the text and the nickname fileds
   postMessage(text, nickname, roomOptions)
   userInput.value = ''
 }
@@ -80,10 +127,42 @@ function postMessage (text, nickname, roomOptions) {
 function getMessages () {
   fetch('/messages')
     .then(response => response.json())
-    .then(data => render(data)) // run the render function with data "json"
-    .then(data => console.log(data, 'this is data'))
+    // .then(data => render(data)) // run the render function with data "json"
+    .then(data => render(data.filter(item => item.room === roomSelect.value)))
+}
+function getRooms () {
+  fetch('/messages')
+    .then(response => response.json())
+    // .then(data => render(data)) // run the render function with data "json"
+    // .then(data => filter(data))
+    .then(data => filterd(data.map(msg => msg.room)))
+    // .then(data => render(data.filter(item => item.room === roomSelect.value)))
+}
+getRooms()
+
+function filterd (filterRooms) {
+  const filter = filterRooms.filter(room => room)
+  // console.log(filter)
+  const sayHi = Array.from(new Set(filter))
+  // allRooms.push(sayHi)
+  together(sayHi)
+  return sayHi
 }
 
+function together (sayHi) {
+  console.log(sayHi)
+  return yo`<div id='rooms>
+  <select>
+    <option value="">--Select a Room--</option>
+    ${sayHi.map(roomname => yo`<option>${roomname}</option>`)}
+    </select>
+  </div>`
+}
+
+document.body.appendChild(together())
+// const allRooms = filterd()
+// console.log(allRooms)
+// console.log(filterd, 'this is filtered')
 // postMessage('hello')
 
 // runs the get messages function every 2 seconds getting all new messages to post on the page
@@ -94,7 +173,6 @@ function initalPage () {
 }
 
 // ** THE BELOW IS AN EXAMPLE THAT I (AUSTEN MADE AND DID NOT USE FOR NICKNAME) **
-
 
 // this function needs uncomented to run the chat room
 // initalPage()
